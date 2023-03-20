@@ -10,7 +10,6 @@ import androidx.viewpager2.widget.ViewPager2
 
 class MyPagerFragment : Fragment() {
 
-    private lateinit var pagerAdapter: PagerAdapter
     private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

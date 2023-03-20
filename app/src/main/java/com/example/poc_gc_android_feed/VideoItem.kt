@@ -75,8 +75,10 @@ class VideoItem : Fragment(){
     }
 
     private fun releasePlayer() {
-        player?.release()
-        player = null
+        if (player != null) {
+            player?.release()
+            player = null
+        }
     }
 
     private fun initPlayer(videoURL: String, isFirstVideo: Boolean) {

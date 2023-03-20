@@ -1,28 +1,31 @@
 package com.example.poc_gc_android_feed
 
-import android.annotation.SuppressLint
 import android.view.View
+import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
-import kotlin.math.max
+import java.lang.Math.abs
 
-@SuppressLint("ResourceType")
 class FadePageTransformer : ViewPager2.PageTransformer {
-
     override fun transformPage(page: View, position: Float) {
         val pageWidth = page.width
-        val pageMargin = page.context.resources.getDimensionPixelSize(R.dimen.fab_margin)
-        val offset = position * -(2 * pageMargin + pageWidth)
+        val pageHeight = page.height
 
-        if (position < -1) {
-            page.translationY = -offset
-        } else if (position <= 1) {
-            val scaleFactor = max(0.7f, 1 - kotlin.math.abs(position - 0.14285715f))
-            page.translationY = offset
-            page.scaleY = scaleFactor
-            page.alpha = scaleFactor
-        } else {
-            page.alpha = 0f
-            page.translationY = offset
+        when {
+            position < -1 -> {
+                // This page is way off-screen to the left.
+                page.alpha = 0f
+            }
+            position <= 1 -> {
+                page.alpha = 1f
+
+                // set Y position to swipe in from top
+                val yPosition = position * pageHeight
+                page.translationY = yPosition
+            }
+            else -> {
+                // This page is way off-screen to the right.
+                page.alpha = 0f
+            }
         }
     }
 }

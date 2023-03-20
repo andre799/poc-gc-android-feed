@@ -13,6 +13,6 @@
         android:fitsSystemWindows="true"
         android:keepScreenOn="true"
         app:use_controller="false"
-        app:resize_mode="fit"/>
+        app:resize_mode="fill"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

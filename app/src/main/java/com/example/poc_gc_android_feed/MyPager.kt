@@ -19,6 +19,7 @@ class MyPagerFragment : Fragment() {
         viewPager = view.findViewById(R.id.vertical_view_pager)
         viewPager.setPageTransformer(FadePageTransformer())
         viewPager.offscreenPageLimit = 3
+        viewPager.orientation = ViewPager2.ORIENTATION_VERTICAL
 
         val interpolator = LinearOutSlowInInterpolator()
         val scrollDuration = 250.toLong()
@@ -31,9 +32,12 @@ class MyPagerFragment : Fragment() {
 
         // Criando uma instância do VideoPagerAdapter e passando a lista de vídeos para ele
         val videoPagerAdapter = PagerAdapter(this, listOf(
-            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-winter-fashion-cold-looking-woman-concept-video-39874-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-mother-with-her-little-daughter-eating-a-marshmallow-in-nature-39764-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-man-runs-past-ground-level-shot-32809-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-photoshoot-of-a-girl-posing-in-the-desert-34409-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-young-man-skating-in-a-parking-lot-34550-large.mp4",
         ))
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

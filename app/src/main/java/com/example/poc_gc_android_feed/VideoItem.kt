@@ -27,26 +27,6 @@ class VideoItem : Fragment(){
         }
     }
 
-    fun play(){
-        player?.play()
-    }
-
-    fun pause(){
-        player?.pause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        player?.seekTo(playbackPosition)
-        player?.playWhenReady = true
-    }
-
-    override fun onPause() {
-        super.onPause()
-        playbackPosition = player?.currentPosition ?: 0
-        player?.playWhenReady = false
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,6 +47,26 @@ class VideoItem : Fragment(){
         val isFirstVideo = arguments?.getBoolean("isFirstVideo")
 
         initPlayer(videoUrl!!, isFirstVideo ?: false)
+    }
+
+    fun play(){
+        player?.play()
+    }
+
+    fun pause(){
+        player?.pause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        player?.seekTo(playbackPosition)
+        player?.playWhenReady = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playbackPosition = player?.currentPosition ?: 0
+        player?.playWhenReady = false
     }
 
     override fun onDestroyView() {

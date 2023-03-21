@@ -2,12 +2,12 @@ package com.example.poc_gc_android_feed
 
 import android.view.View
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import java.lang.Math.abs
 
 class FadePageTransformer : ViewPager2.PageTransformer {
     override fun transformPage(page: View, position: Float) {
-        val pageWidth = page.width
         val pageHeight = page.height
 
         when {
@@ -27,5 +27,9 @@ class FadePageTransformer : ViewPager2.PageTransformer {
                 page.alpha = 0f
             }
         }
+
+        val marginPageTransformer = MarginPageTransformer(0)
+
+        marginPageTransformer.transformPage(page, position)
     }
 }

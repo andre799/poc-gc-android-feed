@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 class VideoItem : Fragment(){
     var player: ExoPlayer? = null
     private lateinit var playerView: StyledPlayerView
-    private var playbackPosition: Long = 0
 
     companion object {
         fun newInstance(videoUrl: String, isFirstVideo: Boolean): VideoItem {
@@ -59,14 +58,13 @@ class VideoItem : Fragment(){
 
     override fun onResume() {
         super.onResume()
-        player?.seekTo(playbackPosition)
-        player?.playWhenReady = true
+        play()
     }
 
     override fun onPause() {
         super.onPause()
-        playbackPosition = player?.currentPosition ?: 0
-        player?.playWhenReady = false
+        player?.seekTo(0)
+        pause()
     }
 
     override fun onDestroyView() {

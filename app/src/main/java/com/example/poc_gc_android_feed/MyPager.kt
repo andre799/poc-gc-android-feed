@@ -4,12 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.core.view.marginEnd
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
@@ -17,15 +23,20 @@ import java.io.IOException
 class MyPagerFragment : Fragment() {
 
     private lateinit var viewPager: ViewPager2
+    private lateinit var pagerAdapter: PagerAdapter
     private var currentPosition = 0
+    private var currentPage = 0
+    private var loadingMoreVideos = false
 
-    private val videoApiClient = PostsRepository()
-    private var isLoading = false
+    private val postsRepository = PostsRepository()
 
-    private var _videos = mutableListOf<VideoItem>()
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_my_pager, container, false)
+        val mainView = inflater.inflate(R.layout.fragment_my_pager, container, false)
 
         viewPager = view.findViewById(R.id.vertical_view_pager)
         viewPager.setPageTransformer(FadePageTransformer())
@@ -42,42 +53,49 @@ class MyPagerFragment : Fragment() {
         }
 
         // Criando uma instância do VideoPagerAdapter e passando a lista de vídeos para ele
-        val videoPagerAdapter = PagerAdapter(this, listOf(
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/03/14/641128c7e8288732872402/641128c80d1e3704105797_standardized.mp4",
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/03/16/6413970c3091c131855780/6413970c4b19e813324051_standardized.mp4",
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/03/14/6410d518529ca639861848/6410d518664af477179873_standardized.mp4",
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/03/15/6411a09537a12742492949/6411a0954b026124729150_standardized.mp4",
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/02/24/63f93b2e671ab307811258/63f93b2e79bb5106613662_standardized.mp4",
-            "https://d2c2zt048tit41.cloudfront.net/post/media/processed/video/2023/03/16/6413a53d1a03d964179461/6413a53d31b2c890358329_standardized.mp4",
-        ))
+        pagerAdapter = PagerAdapter(this)
+
+        viewPager.adapter = pagerAdapter
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-//                if (position != currentPosition) {
-//                    val currentFragment = videoPagerAdapter.getFragmentAtPosition(currentPosition)
-//                    currentFragment?.pause()
-//
-//                    val nextFragment = videoPagerAdapter.getFragmentAtPosition(position)
-//                    nextFragment?.play()
-//
-//                    val allFragments = videoPagerAdapter.getAllFragments()
-//
-//                    for (fragment in allFragments) {
-//                        if(fragment != nextFragment) fragment?.pause()
-//                    }
-//                }
-
-                currentPosition = position
             }
 
             override fun onPageScrollStateChanged(state: Int) {}
 
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-        })
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                currentPosition = position
 
-        viewPager.adapter = videoPagerAdapter
+                if (!loadingMoreVideos && positionOffset == 0.0.toFloat() && (currentPosition == pagerAdapter.videos.size - 4 || currentPosition == pagerAdapter.videos.size - 2)) {
+                    currentPage++
+                    loadVideos()
+                }
+            }
+        })
 
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadVideos()
+    }
+
+    private val scope = CoroutineScope(Dispatchers.Main)
+
+    private fun loadVideos() {
+        loadingMoreVideos = true
+        scope.launch(Dispatchers.IO) {
+            val posts = postsRepository.getVideos(currentPage)
+            val videoItems = posts.mapNotNull { it.getSource() }
+            withContext(Dispatchers.Main) {
+                pagerAdapter.addVideos(videoItems)
+                loadingMoreVideos = false
+            }
+        }
+    }
 }
